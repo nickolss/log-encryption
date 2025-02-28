@@ -6,6 +6,7 @@ import {
   randomBytes,
   scryptSync,
 } from 'crypto';
+import { DecryptLogDto } from './dto/decryptLog';
 
 @Injectable()
 export class LogService {
@@ -30,7 +31,7 @@ export class LogService {
     return encrypted;
   }
 
-  decryptLog(cryptLog: Record<string, string>): Record<string, any> {
+  decryptLog(cryptLog: DecryptLogDto): Record<string, any> {
     const decipher = createDecipheriv(this.algorithm, this.secretKey, this.iv);
     let decrypted = decipher.update(cryptLog.encryptedLog, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
