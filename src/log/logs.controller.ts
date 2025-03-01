@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Query } from '@nestjs/common';
 import { LogService } from './logs.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { EncryptLogDto } from './dto/encryptLog';
 import { DecryptLogDto } from './dto/decryptLog';
 
@@ -11,6 +11,14 @@ export class LogsController {
 
   @Post('crypt')
   @ApiOperation({ summary: 'Encrypt log' })
+  @ApiResponse({
+    status: 200,
+    description: 'Log successfully encrypted',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request - Invalid data provided',
+  })
   encryptLog(
     @Body() log: EncryptLogDto,
     @Query('secret') secret: string,
@@ -20,6 +28,18 @@ export class LogsController {
 
   @Post('decrypt')
   @ApiOperation({ summary: 'Decrypt log' })
+  @ApiResponse({
+    status: 200,
+    description: 'Log successfullt decrypted',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request - Invalid data provided',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid secret key provided or corrupted log',
+  })
   decryptLog(
     @Body() cryptLog: DecryptLogDto,
     @Query('secret') secret: string,

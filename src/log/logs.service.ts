@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   createCipheriv,
   createDecipheriv,
@@ -27,10 +27,14 @@ export class LogService {
     const iv = Buffer.from(ivHex, 'hex');
     const secretKey = scryptSync(secret, 'salt', 32);
 
-    const decipher = createDecipheriv(this.algorithm, secretKey, iv);
-    let decrypted = decipher.update(encryptedLog, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+    try {
+      const decipher = createDecipheriv(this.algorithm, secretKey, iv);
+      let decrypted = decipher.update(encryptedLog, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
 
-    return JSON.parse(decrypted);
+      return JSON.parse(decrypted);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid secret key or corrupted log');
+    }
   }
 }
